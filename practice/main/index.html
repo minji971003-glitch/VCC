@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>메인 화면 (A 담당)</title>
+<link rel="stylesheet" href="../common/style.css">
+</head>
+<body>
+<div class="app">
+  <h1>외대人사이드 연습</h1>
+  <p class="sub">학생을 고르면 인터뷰 화면으로 이동합니다.</p>
+  <div id="list"></div>
+  <button class="plain" id="reset">인터뷰 기록 지우기</button>
+</div>
+<script src="../common/data.js"></script>
+<script>
+  async function draw() {
+    const students = await loadStudents();
+    const interviews = loadInterviews();
+    document.getElementById("list").innerHTML = students.map((s) => {
+      const count = interviews.filter((i) => i.studentId === s.id).length;
+      const areas = s.experiences.map((e) => e.area).join(", ") || "경험 없음";
+      return `<a class="card" href="../interview/?id=${s.id}">
+        <strong>${s.name}</strong>
+        <small>${s.major} ${s.grade}학년 / ${areas}</small><br>
+        <span class="badge">인터뷰 ${count}건</span>
+      </a>`;
+    }).join("");
+  }
+
+  document.getElementById("reset").onclick = () => { clearInterviews(); draw(); };
+  draw();
+</script>
+</body>
+</html>
