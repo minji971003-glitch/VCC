@@ -1,0 +1,5 @@
+[
+  {"id": "S001", "name": "가상학생 김외대", "major": "가상학과A", "grade": 1, "experiences": []},
+  {"id": "S002", "name": "가상선배 이교환", "major": "가상학과A", "grade": 3, "experiences": [{"area": "교환학생", "program": "가상대학 교환", "hasReport": true}]},
+  {"id": "S003", "name": "가상선배 박비교", "major": "가상학과B", "grade": 4, "experiences": [{"area": "비교과", "program": "가상 취업 특강", "hasReport": false}]}
+]
