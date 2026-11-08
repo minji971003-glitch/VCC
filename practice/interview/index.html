@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>인터뷰 화면 (B 담당)</title>
+<link rel="stylesheet" href="../common/style.css">
+</head>
+<body>
+<div class="app">
+  <h1 id="title">인터뷰</h1>
+  <p class="sub" id="guide"></p>
+  <form id="form"></form>
+  <p><a href="../main/">메인으로 돌아가기</a></p>
+</div>
+<script src="../common/data.js"></script>
+<script>
+  // 기획서의 적응형 인터뷰 세 갈래를 AI 없이 규칙으로 흉내 냅니다.
+  function pickRoute(student) {
+    if (student.experiences.length === 0) {
+      return { route: "curious", guide: "경험이 없는 학생: 궁금한 것을 묻습니다.",
+        questions: ["교환학생, 인턴십, 비교과 중 가장 궁금한 것은 무엇인가요?"] };
+    }
+
+    const program = student.experiences[0].program;
+    if (student.experiences.some((e) => e.hasReport)) {
+      return { route: "short", guide: "보고서가 있는 학생: 보고서에 없는 것만 짧게 묻습니다.",
+        questions: [`${program}, 지금 와서 보니 어땠나요?`, "후배에게 한마디 해 주세요."] };
+    }
+
+    return { route: "detailed", guide: "이수 이력만 있는 학생: 자세히 묻습니다.",
+      questions: [`${program}에서 무엇을 했나요?`, "무엇을 배웠나요?", "후배에게 추천한다면 어떤 사람에게 권하나요?"] };
+  }
+
+  async function start() {
+    const id = new URLSearchParams(location.search).get("id");
+    const students = await loadStudents();
+    const student = students.find((s) => s.id === id);
+    if (!student) {
+      document.getElementById("title").textContent = "학생을 찾을 수 없습니다";
+      return;
+    }
+
+    const plan = pickRoute(student);
+    document.getElementById("title").textContent = `${student.name} 인터뷰`;
+    document.getElementById("guide").textContent = plan.guide;
+    const form = document.getElementById("form");
+    form.innerHTML = plan.questions.map((q, n) =>
+      `<label for="q${n}">${q}</label><textarea id="q${n}" required></textarea>`
+    ).join("") + "<button type='submit'>저장</button>";
+    form.onsubmit = (event) => {
+      event.preventDefault();
+      saveInterview({
+        studentId: student.id,
+        route: plan.route,
+        answers: plan.questions.map((q, n) => ({ q, a: document.getElementById("q" + n).value })),
+        savedAt: new Date().toISOString(),
+      });
+      location.href = "../main/";
+    };
+  }
+
+  start();
+</script>
+</body>
+</html>
+
